@@ -3,8 +3,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/pegasus-ps5/pegasus-dl/releases/tag/v1.10.1"><img alt="Release" src="https://img.shields.io/github/v/release/pegasus-ps5/pegasus-dl?label=release&color=24292f"></a>
-  <a href="https://github.com/pegasus-ps5/pegasus-dl/releases/download/v1.10.1/pegasus_dl.elf"><img alt="Download" src="https://img.shields.io/badge/download-release-24292f"></a>
+  <a href="https://github.com/pegasus-ps5/pegasus-dl/releases/tag/v1.11.0"><img alt="Release" src="https://img.shields.io/github/v/release/pegasus-ps5/pegasus-dl?label=release&color=24292f"></a>
+  <a href="https://github.com/pegasus-ps5/pegasus-dl/releases/download/v1.11.0/pegasus_dl.elf"><img alt="Download" src="https://img.shields.io/badge/download-release-24292f"></a>
   <img alt="Built-in providers" src="https://img.shields.io/badge/providers-built--in-24292f">
   <img alt="PS5 homebrew" src="https://img.shields.io/badge/PS5-homebrew-24292f">
 </p>
@@ -25,8 +25,8 @@ tablet, or computer.
 It is designed to keep the download workflow on the PS5 instead of routing
 packages through another machine first.
 
-Version 1.10.1 improves Store browsing, search, and poster loading for large
-catalogs.
+Version 1.11.0 improves parallel downloads and archive pause, resume, and
+password handling.
 
 ## Demo
 
@@ -36,7 +36,7 @@ catalogs.
 
 | Release | Version |
 | --- | --- |
-| [`pegasus_dl.elf`](https://github.com/pegasus-ps5/pegasus-dl/releases/download/v1.10.1/pegasus_dl.elf) | `1.10.1` |
+| [`pegasus_dl.elf`](https://github.com/pegasus-ps5/pegasus-dl/releases/download/v1.11.0/pegasus_dl.elf) | `1.11.0` |
 
 ## Quick Start
 
@@ -60,7 +60,7 @@ catalogs.
 
 ## Features
 
-| Area | Included in 1.10.1 |
+| Area | Included in 1.11.0 |
 | --- | --- |
 | Sources | Add catalog files or URL sources, discover and enable Included sources, refresh URL sources, enable or disable sources, delete sources |
 | Store catalog | Search packages, filter by source, review versions, sizes, details, and links |
@@ -70,7 +70,7 @@ catalogs.
 | Queue control | Pause, resume, cancel, retry, and clear finished jobs |
 | Storage | Browse writable destinations, create folders, and choose where downloads land |
 | File Manager | Browse mounted storage, upload and download files, copy, move, rename, delete, archive folders, extract RAR files, use mount shortcuts, and install local `.pkg` files |
-| Performance | Use multiple download connections with resume support when the host allows it |
+| Performance | Use configurable parallel downloads, with 16 connections by default, checked resume, and a single-stream fallback when ranges are unavailable |
 | Logs | View payload messages and browser-side errors from the Logs tab |
 | Provider links | Resolve supported providers inside the payload, or use PS5 browser-assisted capture for compatible provider pages |
 | Debrid services | Save local Real-Debrid and TorBox API tokens, validate supported hosts, badge compatible links, choose returned files, and queue resolved downloads |
@@ -127,10 +127,19 @@ Pegasus DL recognizes supported archive links before queueing them. A
 single-file `.rar`, RAR5, or `.7z` download is extracted into the selected
 destination automatically instead of leaving the archive file behind.
 
-Archive jobs show extraction and finalization progress in the queue. RAR/RAR5
-jobs can pause for a password when needed. 7z archives use HTTP range reads when
-seeking is required, so the host must support byte ranges; password-protected
-7z files are detected but not extracted yet.
+Archive jobs show extraction and finalization progress in the queue. With
+multiple connections selected, RAR/RAR5 and 7z downloads use the parallel
+downloader and extract from a temporary disk cache. The destination needs room
+for both the compressed archive and the extracted files.
+
+Completed caches are kept across RAR password prompts, wrong passwords, and
+extraction pauses, so extraction can restart without downloading the archive
+again. Paused cache downloads resume from checked range checkpoints. UTF-8 RAR
+passwords are supported.
+
+Selecting one connection keeps streaming extraction; 7z seeking in this mode
+requires a host that supports byte ranges. Password-protected 7z files are
+detected but not extracted yet.
 
 Split archives such as `.part1.rar`, `.r00`, and `.7z.001` are rejected. During
 finalization, Pegasus unwraps simple outer folders when the extracted content
@@ -183,10 +192,21 @@ Current provider handling:
 | Unknown | Pegasus can try guarded browser capture and queue the URL only after response validation |
 | Not supported | The link can still be opened in the PS5 browser, but Pegasus will not queue from it automatically |
 
-## 1.10.1 Notes
+## 1.11.0 Notes
 
-- Faster Store search and source filtering for large catalogs, with cached
-  results and a short delay while typing to avoid repeated filtering.
+- Parallel downloads now use persistent connections and write ranges directly
+  into the temporary file, avoiding a final segment-copy pass. New configurations
+  default to 16 connections, with a single-stream fallback for incompatible hosts.
+- RAR/RAR5 and 7z archive cache downloads use the same parallel engine. Paused
+  downloads resume from checked checkpoints, and paused extraction restarts from
+  the completed cache without downloading again.
+- Completed RAR caches survive password prompts and wrong passwords. UTF-8
+  passwords and retries for legacy encrypted RAR files are handled correctly.
+- Extraction progress now counts bytes across files. Cancellation and
+  finalization are coordinated to avoid committing cancelled work.
+- Archive replacement failures restore the previous destination, stored RAR
+  entries receive CRC checks, and failed format probes clean up their temporary
+  files.
 
 ## Scope
 
