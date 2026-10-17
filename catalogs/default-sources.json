@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "revision": 2,
+  "revision": 3,
   "onboardingRevision": 1,
   "sources": [
     {
@@ -14,28 +14,28 @@
       "id": "dlps",
       "name": "DLPS Catalog",
       "description": "Games and DLCs from DLPSGAME in various formats",
-      "url": "https://pegasus-catalog.fly.dev/catalogs/dlps.json",
+      "url": "https://pegasus-dl.dev/catalogs/dlps.json",
       "defaultEnabled": true
     },
     {
       "id": "pippo-exfat",
       "name": "Pippo .exFAT",
       "description": "Games and DLCs in .exfat and .pkg format",
-      "url": "https://pegasus-catalog.fly.dev/catalogs/pippo.json",
+      "url": "https://pegasus-dl.dev/catalogs/pippo.json",
       "defaultEnabled": true
     },
     {
       "id": "pfs",
       "name": "PFS Catalog",
       "description": "Games and DLCs in .ffpfsc and .pkg format",
-      "url": "https://pegasus-catalog.fly.dev/catalogs/pfs.json",
+      "url": "https://pegasus-dl.dev/catalogs/pfs.json",
       "defaultEnabled": true
     },
     {
       "id": "zer0",
       "name": "ZER0GAME Catalog",
       "description": "Games and DLCs in .pkg format",
-      "url": "https://pegasus-catalog.fly.dev/catalogs/zer0.json",
+      "url": "https://pegasus-dl.dev/catalogs/zer0.json",
       "defaultEnabled": true
     }
   ]
